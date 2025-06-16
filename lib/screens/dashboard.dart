@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:admin/providers/sale.dart';
 import 'package:admin/providers/url.dart';
 import 'package:admin/providers/username.dart';
 import 'package:admin/screens/login.dart';
@@ -25,7 +26,7 @@ class _DashboardState extends ConsumerState<Dashboard> {
 
     if (response.statusCode == 200) {
       final jsonRes = await jsonDecode(response.body);
-      print(jsonRes);
+      ref.read(saleProvider.notifier).list(jsonRes['sale']);
     }
   }
 
@@ -50,6 +51,7 @@ class _DashboardState extends ConsumerState<Dashboard> {
     }
 
     final username = ref.watch(usernameProvider);
+    final sales = ref.watch(saleProvider);
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
@@ -162,6 +164,62 @@ class _DashboardState extends ConsumerState<Dashboard> {
                     ),
                   ),
                 ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child:
+                  (sales.isEmpty)
+                      ? Text('no sale currently')
+                      : Column(
+                        children: List.generate(sales.length, (index) {
+                          return ListTile(
+                            title: Text(
+                              sales[index]['sku'],
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            leading: Text(
+                              sales[index]['quantity'].toString(),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing: Text(
+                              sales[index]['productPrice'].toString(),
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              "Margin: ${sales[index]['margin'].toString()}",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+            ),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  Divider(
+                    color: Colors.grey,
+                    endIndent: 5,
+                    indent: 5,
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Total profit today: ${ref.read(saleProvider.notifier).getTotalProfit().toString()}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
             ),
           ],

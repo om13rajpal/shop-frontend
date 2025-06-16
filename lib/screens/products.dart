@@ -51,7 +51,7 @@ class _ProductsState extends ConsumerState<Products> {
       final imageUrl = Uri.parse('$url/qrcode/$sku.png');
       print(imageUrl);
       if (await canLaunchUrl(imageUrl)) {
-        await launchUrl(imageUrl, mode: LaunchMode.externalApplication);
+        await launchUrl(imageUrl);
       } else {
         final snackbar = SnackBar(content: Text('Error launching qr code'));
         if (!context.mounted) return;
