@@ -12,6 +12,11 @@ class QrCode extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final url = ref.read(urlProvider);
+    final MobileScannerController controller = MobileScannerController(
+      facing: CameraFacing.front,
+      autoZoom: true,
+      torchEnabled: true,
+    );
     Future<void> saveSale(String sku, int quantity, int price) async {
       final body = {
         "sku": sku,
@@ -51,6 +56,7 @@ class QrCode extends ConsumerWidget {
         ),
       ),
       body: MobileScanner(
+        controller: controller,
         onDetect: (barcode) {
           if (barcode.raw != null) {
             final json = jsonDecode(barcode.barcodes.first.rawValue.toString());
@@ -60,6 +66,7 @@ class QrCode extends ConsumerWidget {
             TextEditingController quantity = TextEditingController();
             showDialog(
               barrierDismissible: false,
+              useSafeArea: true,
               context: context,
               builder: (context) {
                 return AlertDialog(
@@ -82,12 +89,14 @@ class QrCode extends ConsumerWidget {
                           decoration: InputDecoration(label: Text('quantity')),
                         ),
                         ElevatedButton(
-                          onPressed:
-                              () => saveSale(
-                                json['sku'],
-                                int.parse(quantity.text.trim()),
-                                int.parse(price.text.trim()),
-                              ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            saveSale(
+                              json['sku'],
+                              int.parse(quantity.text.trim()),
+                              int.parse(price.text.trim()),
+                            );
+                          },
                           child: Text('Sell'),
                         ),
                       ],
