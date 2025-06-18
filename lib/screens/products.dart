@@ -28,16 +28,17 @@ class _ProductsState extends ConsumerState<Products> {
   Future<void> deleteProduct(String sku, WidgetRef ref) async {
     final url = ref.read(urlProvider);
     final response = await http.delete(Uri.parse("$url/product/$sku"));
+    if (!mounted) return;
 
-    if (response.statusCode == 200) {
-      const snackbar = SnackBar(content: Text('Deleted the product'));
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    } else {
-      if (!context.mounted) return;
-      const snackbar = SnackBar(content: Text('Error deleting the product'));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    }
+    final snackbar = SnackBar(
+      content: Text(
+        response.statusCode == 200
+            ? 'Deleted the product'
+            : 'Error deleting the product',
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   Future<void> generateQR(String sku, WidgetRef ref) async {
@@ -45,21 +46,20 @@ class _ProductsState extends ConsumerState<Products> {
     final response = await http.post(Uri.parse("$url/product/qr/$sku"));
     if (response.statusCode == 200) {
       final snackbar = SnackBar(content: Text('QR generated successfully'));
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
       Future.delayed(Duration(milliseconds: 400));
       final imageUrl = Uri.parse('$url/qrcode/$sku.png');
-      print(imageUrl);
       if (await canLaunchUrl(imageUrl)) {
         await launchUrl(imageUrl);
       } else {
         final snackbar = SnackBar(content: Text('Error launching qr code'));
-        if (!context.mounted) return;
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
     } else {
       final snackbar = SnackBar(content: Text('Error generating qr code'));
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
@@ -77,12 +77,12 @@ class _ProductsState extends ConsumerState<Products> {
 
     if (response.statusCode == 200) {
       final snackbar = SnackBar(content: Text('Quantity for $sku is updated'));
-      if (!context.mounted) return;
+      if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
     } else {
       final snackbar = SnackBar(content: Text('Error updating $sku quantity'));
-      if (!context.mounted) return;
+      if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }

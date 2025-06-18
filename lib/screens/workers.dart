@@ -19,7 +19,6 @@ class _WorkersState extends ConsumerState<Workers> {
 
     if (response.statusCode == 200) {
       final jsonRes = await jsonDecode(response.body);
-      print(jsonRes);
       ref.read(workerProvider.notifier).setWorkers(jsonRes['workers']);
     }
   }
@@ -32,14 +31,13 @@ class _WorkersState extends ConsumerState<Workers> {
 
     if (response.statusCode == 200) {
       final jsonRes = await jsonDecode(response.body);
-      print(jsonRes);
-      if (!context.mounted) return;
+      if (!mounted) return;
       final snackbar = SnackBar(content: Text(jsonRes['message']));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
 
       ref.read(workerProvider.notifier).remove(id);
     } else {
-      if (!context.mounted) return;
+      if (!mounted) return;
       const errorbar = SnackBar(content: Text('error verifying'));
       ScaffoldMessenger.of(context).showSnackBar(errorbar);
     }
@@ -56,7 +54,6 @@ class _WorkersState extends ConsumerState<Workers> {
   Widget build(BuildContext context) {
     final workers = ref.watch(workerProvider);
     final url = ref.watch(urlProvider);
-    print(workers);
     return Scaffold(
       appBar: AppBar(
         elevation: 5,

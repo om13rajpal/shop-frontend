@@ -43,7 +43,6 @@ class Product extends ConsumerWidget {
       );
 
       final jsonRes = await jsonDecode(response.body);
-      print(jsonRes);
       if (response.statusCode == 201) {
         final snackbar = SnackBar(content: Text(jsonRes['message']));
         if (!context.mounted) return;

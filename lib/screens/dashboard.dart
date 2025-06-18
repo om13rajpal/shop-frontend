@@ -169,7 +169,10 @@ class _DashboardState extends ConsumerState<Dashboard> {
             SliverToBoxAdapter(
               child:
                   (sales.isEmpty)
-                      ? Text('no sale currently')
+                      ? Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 2),
+                        child: Center(child: Text('no sale currently')),
+                      )
                       : Column(
                         children: List.generate(sales.length, (index) {
                           return ListTile(
